@@ -1,2 +1,2 @@
 # soundseeing
-a bunch of noisy Csound programs
+(+ "Csound programs" "Supercollider programs" "VCVRack patches")
