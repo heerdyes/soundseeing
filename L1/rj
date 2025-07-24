@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+csound -+rtaudio=jack -odac -b128 -B256 -m128 $1.orc $1.sco

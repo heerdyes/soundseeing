@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+touch $1.orc
+echo "sr=44100" >> $1.orc
+echo "ksmps=32" >> $1.orc
+echo "nchnls=2" >> $1.orc
+echo "0dbfs=1"  >> $1.orc
+echo ""         >> $1.orc
+echo "instr 1"  >> $1.orc
+echo "endin"    >> $1.orc
+
+touch $1.sco
+echo "f 1 0 8192 10 1" >> $1.sco
+echo ""                >> $1.sco
+echo "i 1 0 1"         >> $1.sco
+echo "e"               >> $1.sco
+
+echo "good luck with your composition: $1"
