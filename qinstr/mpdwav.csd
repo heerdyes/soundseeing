@@ -26,42 +26,63 @@ gkfxdlyt                init                    .4
 gkfxdlyfb               init                    .45
 gkdlyamt                init                    .25
 
-giaudix                 init                    7.7
-giaudiy                 init                    16.7
-giaudiz                 init                    5.3
-gkaudimicx              init                    3.3
+giaudix                 init                    11.2
+giaudiy                 init                    19.0
+giaudiz                 init                    9.1
+gkaudimicx              init                    5.4
 gkaudimicy              init                    1.3
 gkaudimicz              init                    1.9
 gkrvbamt                init                    .15
 
-gkatkmax                init                    .25
+gkatkmax                init                    .22
 gkrelmax                init                    2
 gkatk                   init                    .022
 gkrel                   init                    1.8
 gkoct                   init                    0
 
+;; knobs
+gkn3                    init                    0
+gkn4                    init                    0
+gkn5                    init                    0
+gkn6                    init                    0
+
 ; -------------- - - - - ------------------ ;
 ;                slider gui                 ;
 ; -------------- - - - - ------------------ ;
-                        FLpanel                 "mpdwav", 1280, 720, 320, 180, 0, 1
+ipnlw                   =                       1600
+ipnlh                   =                       900
+ioffx                   =                       (1920-ipnlw)/2
+ioffy                   =                       (1080-ipnlh)/2
+
+                        FLpanel                 "mpdwav", ipnlw,ipnlh, ioffx,ioffy, 0,1
 iexp                    =                       0 ; // linear: 0 // log: -1
 itype                   =                       5 ; // graphic type (5='nice' slider)
 idisp                   =                       -1 ; // display handle (-1=not used)
 
-iwidth                  =                       1080
+iwidth                  =                       1400
 iheight                 =                       32
 ix                      =                       100
 iy                      =                       48
 
-gkdlyamt, ihdly         FLslider                "delay amt",  0,.94, iexp,itype,idisp, iwidth,iheight, ix,iy
-gkrvbamt, ihrvb         FLslider                "reverb amt", 0,.88, iexp,itype,idisp, iwidth,iheight, ix,iy*2
-gkvoxlp, ihvxlp         FLslider                "vox lopass", 1111,8888, iexp,itype,idisp, iwidth,iheight, ix,iy*3
+gkdlyamt,ihdly          FLslider                "DLY amt",  .04,.96, iexp,itype,idisp, iwidth,iheight, ix,iy
+gkfxdlyt,ihdlyt         FLslider                "DLY time", .05,1.4, iexp,itype,idisp, iwidth,iheight, ix,iy*2
+
+gkrvbamt,ihrvb          FLslider                "RVB amt", 0,.88, iexp,itype,idisp, iwidth,iheight, ix,iy*4
+gkaudimicx,ihmicx       FLslider                "RVB mic X", .05*giaudix,.95*giaudix, iexp,itype,idisp, iwidth,iheight, ix,iy*5
+gkaudimicy,ihmicy       FLslider                "RVB mic Y", .05*giaudiy,.95*giaudiy, iexp,itype,idisp, iwidth,iheight, ix,iy*6
+gkaudimicz,ihmicz       FLslider                "RVB mic Z", .05*giaudiz,.95*giaudiz, iexp,itype,idisp, iwidth,iheight, ix,iy*7
+
+gkvoxlp, ihvxlp         FLslider                "VOX lp", 1111,8888, iexp,itype,idisp, iwidth,iheight, ix,iy*9
                         FLpanelEnd
                         
                         FLrun
 
                         FLsetVal_i .25, ihdly
+                        FLsetVal_i .18, ihdlyt
                         FLsetVal_i .11, ihrvb
+                        FLsetVal_i 5.3, ihmicx
+                        FLsetVal_i 1.4, ihmicy
+                        FLsetVal_i 1.8, ihmicz
                         FLsetVal_i 2222, ihvxlp
 
 ; ----------------- ;
@@ -98,26 +119,26 @@ ks,kc,kd1,kd2           midiin
                         
   elseif ks==176 then
     if kd1==3 then
-      gkatk             =                       .001+gkatkmax*kd2/128
+      gkatk             =                       .002+gkatkmax*kd2/128
       
     elseif kd1==9 then
-      gkrel             =                       .001+gkrelmax*kd2/128
+      gkrel             =                       .002+gkrelmax*kd2/128
+      
+    elseif kd1==12 then
+      gkn3              =                       kd2
+    elseif kd1==13 then
+      gkn4              =                       kd2
+    elseif kd1==14 then
+      gkn5              =                       kd2
+    elseif kd1==15 then
+      gkn6              =                       kd2
       
     endif
     
-    printks "[%d] cc: %d, %d\n", .05, kc,kd1,kd2
+;    printks "[%d] cc: %d, %d\n", .05, kc,kd1,kd2
     
   endif
   
-                        endin
-                        
-; ---------- ;
-;   notif    ;
-; ---------- ;
-                        instr                   44
-knv                     expseg                  1,p3,.01
-aout                    oscil                   knv,1200,1
-                        outall                  aout*p4
                         endin
                         
 ; -------------- ;
@@ -132,16 +153,16 @@ irel                    =                       p7
 
 ifrq                    =                       cpsmidinn(inote)
 iampraw                 =                       ivelo/128
-iamp                    =                       .02+iampraw/3
+iamp                    =                       .02+30*iampraw/64
 
         ; synth
-knv                     expseg                  .01,iatk,1,irel,.01
-a0                      oscil                   knv,ifrq,1
+knv                     expseg                  1,irel,.008
 
-asub                    oscil                   .5,4*ifrq/5,1
-asubu                   =                       asub+.5
+imeth                   =                       1
+ifn                     =                       10
+a0                      pluck                   knv,ifrq,ifrq, ifn,imeth
 
-aout                    =                       iamp*a0*asubu
+aout                    =                       iamp*a0
                         outall                  aout
                         
 gasnd                   +=                      aout
@@ -245,7 +266,8 @@ fst                     partials                fs1,fsi2, .03, 1,3, 500
 ifn1                    =                       4
 ifn0                    =                       2
 a1                      resyn                   fst, 1,1, 500,ifn1
-ktrk                    oscil                   1,.1,1
+
+ktrk                    oscil                   1,.04,1
 a0                      resyn                   fst, 1,2, 330+100*ktrk,ifn0
 
 asyn                    =                       81*a1/100 + 19*a0/100
@@ -279,11 +301,11 @@ adlyout                 =                       afb*gkdlyamt
 
 ;; // reverb
 a0,a1                   babo                    gasnd, gkaudimicx,gkaudimicy,gkaudimicz, giaudix,giaudiy,giaudiz
-arvb                    =                       (a0+a1)/2
-arvbout                 =                       arvb*gkrvbamt
+arvbl                   =                       a0*gkrvbamt
+arvbr                   =                       a1*gkrvbamt
 
-;; // fx out
-                        outall                  adlyout+arvbout
+;; // stereo fx out
+                        outs                    adlyout+arvbl, adlyout+arvbr
                         
 gasnd                   =                       0
                         endin
@@ -292,9 +314,12 @@ gasnd                   =                       0
 <CsScore>
 f 1 0 1024  9  1 1 0
 
-f 2 0 512   7  0 128 1 256 -1 128 0
-f 3 0 256   7  0 16 1 96 1 32 -1 96 -1 16 0
-f 4 0 256   7  1 256 -1
+f 2 0  512   7  0 128 1 256 -1 128 0
+f 3 0  256   7  0 16 1 96 1 32 -1 96 -1 16 0
+f 4 0  256   7  1 256 -1
+
+; random triangular
+f 10 0 512  21  3 1
 
 i 1 0 3600
 i 2 0 3600
@@ -302,4 +327,3 @@ i 500 0 3600
 i 900 0 3600
 </CsScore>
 </CsoundSynthesizer>
-
