@@ -1,10 +1,10 @@
 <CsoundSynthesizer>
 <CsOptions>
--+rtaudio=jack -odac
+--realtime -+rtaudio=alsa -odac -m1
 </CsOptions>
 <CsInstruments>
 sr=44100
-ksmps=16
+ksmps=10
 nchnls=2
 0dbfs=1
 
@@ -13,8 +13,22 @@ gkvol           init            .3333
 gkbasef         init            432
 gkpatch         init            10
 gkdur           init            .91
+gkmaxdur        init            5.6
+gkmindur        init            .022
 gkrvamt         init            .05
 gasnd           init            0
+
+gisativra       init            256/243
+gire            init            9/8
+giretivra       init            32/27
+giga            init            81/64
+gima            init            4/3
+gimativra       init            1024/729
+gipa            init            3/2
+gipativra       init            128/81
+gidha           init            27/16
+gidhativra      init            16/9
+gini            init            243/128
 
 ; --- key sensor --- ;
                 instr           1
@@ -48,9 +62,20 @@ gkrvamt         *=              1.5
 
 ;; // decay duration
     elseif gkn==107 then
-gkdur           *=              .75
+kd              =               .75*gkdur
+      if kd<gkmindur then
+        gkdur   =               gkmindur
+      else
+        gkdur   =               kd
+      endif
+
     elseif gkn==108 then
-gkdur           *=              1.5
+kd              =               1.5*gkdur
+      if kd>gkmaxdur then
+gkdur           =               gkmaxdur
+      else
+gkdur           =               kd
+      endif
 
 ;; ------------------- ;;
 ;; // patch changes // ;;
@@ -112,37 +137,37 @@ gkbasef         *=              3/2
                 event           "i", gkpatch, 0, gkdur, gkbasef
                 
     elseif gkn==115 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2187/2048
+                event           "i", gkpatch, 0, gkdur, gkbasef*gisativra
                 
     elseif gkn==120 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*9/8
+                event           "i", gkpatch, 0, gkdur, gkbasef*gire
                 
     elseif gkn==100 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*19683/16384
+                event           "i", gkpatch, 0, gkdur, gkbasef*giretivra
                 
     elseif gkn==99 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*81/64
+                event           "i", gkpatch, 0, gkdur, gkbasef*giga
                 
     elseif gkn==118 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*4/3
+                event           "i", gkpatch, 0, gkdur, gkbasef*gima
                 
     elseif gkn==103 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*729/512
+                event           "i", gkpatch, 0, gkdur, gkbasef*gimativra
                 
     elseif gkn==98 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*3/2
+                event           "i", gkpatch, 0, gkdur, gkbasef*gipa
                 
     elseif gkn==104 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*6561/4096
+                event           "i", gkpatch, 0, gkdur, gkbasef*gipativra
                 
     elseif gkn==110 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*27/16
+                event           "i", gkpatch, 0, gkdur, gkbasef*gidha
                 
     elseif gkn==106 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*59049/32768
+                event           "i", gkpatch, 0, gkdur, gkbasef*gidhativra
                 
     elseif gkn==109 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*243/128
+                event           "i", gkpatch, 0, gkdur, gkbasef*gini
                 
     elseif gkn==44 then
                 event           "i", gkpatch, 0, gkdur, gkbasef*2
@@ -152,37 +177,37 @@ gkbasef         *=              3/2
                 event           "i", gkpatch, 0, gkdur, gkbasef*2
                 
     elseif gkn==83 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*2187/2048
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gisativra
                 
     elseif gkn==88 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*9/8
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gire
                 
     elseif gkn==68 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*19683/16384
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*giretivra
                 
     elseif gkn==67 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*81/64
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*giga
                 
     elseif gkn==86 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*4/3
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gima
                 
     elseif gkn==71 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*729/512
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gimativra
                 
     elseif gkn==66 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*3/2
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gipa
                 
     elseif gkn==72 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*6561/4096
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gipativra
                 
     elseif gkn==78 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*27/16
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gidha
                 
     elseif gkn==74 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*59049/32768
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gidhativra
                 
     elseif gkn==77 then
-                event           "i", gkpatch, 0, gkdur, gkbasef*2*243/128
+                event           "i", gkpatch, 0, gkdur, gkbasef*2*gini
                 
     elseif gkn==60 then
                 event           "i", gkpatch, 0, gkdur, gkbasef*2*2
@@ -312,18 +337,19 @@ aout            =               a0*gkvol
 gasnd           +=              aout
                 endin
                 
-;; // ----------- adsynt bell 5th ------------ //
+;; // ----------- adsynt octave bell ------------ //
                 instr           15
         idur    =               p3
         ifrq    =               p4
 
-        icnt    =               10
+        icnt    =               5
         kndex   =               0
         klfo    oscil           1,4.18,1
         
 ;; harmonic setup loop
 loop:
-        kb      =               1.5+.0051*klfo
+        kdf     pow             .75,kndex
+        kb      =               2.00+.0051*klfo*kdf
         khf     pow             kb,kndex
         kha     pow             .5,kndex+1
         
@@ -346,7 +372,7 @@ gasnd           +=              asig*gkvol
 idur            =               p3
 ifrq            =               p4
 
-k0              expseg          1,idur,.01
+k0              expseg          1,idur,.09
 
         ; fq vib
 k2              linseg          .125,idur,1
@@ -372,8 +398,47 @@ a3              =               inor*a0 + inor*a1 + ioct*a2
                 outall          a3*gkvol
 gasnd           +=              a3*gkvol
                 endin
+                
+;; // ------------ amp mod tri harp ------------- //
 
-; --- drum patches --- ;
+                instr           17
+idur            =               p3
+ifrq            =               p4
+
+        ; env
+k0              expseg          1,idur,.01
+
+        ; syn
+k1              oscil           1,.11,1
+kmodf           =               81+64*k1
+amod            oscil           1,kmodf,1
+
+kmwet           =               .084
+kmdry           =               1-kmwet
+
+k3              linseg          0,idur/2,1
+k2              oscil           1,3.9,1
+kfq             =               ifrq*(1+.0048*k2*k3)
+
+ifn             =               21
+a0              oscil           k0,kfq*0.999,ifn
+a1              oscil           k0,kfq*1.001,ifn
+
+a2              =               (a0+a1)/2
+a2m             =               a2*(kmdry + kmwet*amod)
+amono           =               a2m
+
+        ; out
+aout            =               amono*gkvol
+                outall          aout
+gasnd           +=              aout
+                endin
+
+
+; ---- - - - - - - ---- ;
+;     drum patches      ;
+; ---- - - - - - - ---- ;
+
 ;; // bass drum
                 instr           100
 idur            =               p3
@@ -493,6 +558,10 @@ f 9 0   64 21  3 1
 f 10 0  32 7  0 32 0
 ; amps
 f 11 0  32 7  0 32 0
+
+;; fractal tri waves
+f 20 0 512 7  0 98 1 10 .9 5 .95 5 .9 10 1 256 -1 10 -.9 5 -.95 5 -.9 10 -1 98 0
+f 21 0 128 7  0 22 1 5 .8 5 1 64 -1 5 -.8 5 -1 22 0
 
 ; key ctl
 i 1 0 7200
